@@ -14,24 +14,40 @@ def sort_jobs(inputFile):
        #if currentDate in inFile.read():
         for line in inFile:
             line = line.strip('\n')
+
+            a, r = update_applied_and_rejection_count(line, 1, 1)
+            appliedCount += a
+            rejections += r
+            
             if currentDate not in line:
                 continue
             else:
-               newJobsList = [linesAfterDate.strip('\n') for linesAfterDate in inFile]
+                newJobsList = []
+                for linesAfterDate in inFile:
+                    linesAfterDate = linesAfterDate.strip('\n')
+                    
+                    a2, r2 = update_applied_and_rejection_count(linesAfterDate, 1, 1)
+                    appliedCount += a2
+                    rejections += r2
+                    
+                    newJobsList.append(linesAfterDate)
+                # newJobsList = [linesAfterDate.strip('\n') for linesAfterDate in inFile]
+                
+                        
         newJobsList.sort() 
 
         if currentDate not in inFile.read():
             firstLine = inFile.readline()
             contentList = [companyNames.strip('\n') for companyNames in inFile.readlines()]
 
-            contentList.sort()
-
+        contentList.sort()
+            
     
     if not os.path.exists("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt"):
 
         with open("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt", 'w') as outFile:
             outFile.write(firstLine + '\n')
-            update_count_rejections_and_applied(contentList, rejections, appliedCount, outFile)
+            update_sorted_file(contentList, rejections, appliedCount, outFile)
             
     elif os.path.exists("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt"):
 
@@ -41,23 +57,30 @@ def sort_jobs(inputFile):
             with open("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt", 'a+') as existingFile:
                 if currentDate not in existingFile.read():
                     existingFile.write("\n{}\n".format(currentDate))
-                    update_count_rejections_and_applied(newJobsList, rejections, appliedCount, existingFile)
+                    update_sorted_file(newJobsList, rejections, appliedCount, existingFile)
 
-            #existingFile.write("\nApplied: {}\n".format(appliedCount))
-            #existingFile.write("Rejections: {}".format(rejections))
+                existingFile.write("\nApplied: {}\n".format(appliedCount - 1))
+                existingFile.write("Rejections: {}".format(rejections))
+        #else:
+            
 
-def update_count_rejections_and_applied(list, rejects, applied, outFile):
+def update_applied_and_rejection_count(line, rCount, aCount):
+    ap = 0
+    rj = 0
+    
+    if('-X' in line):
+        rj += rCount
+    if '/' not in line:
+        if (line != ''):
+            ap += aCount
+    return (ap, rj)
+                            
+def update_sorted_file(list, rejects, applied, outFile):
     for names in list:
-        if('-X' in names):
-            rejects += 1
         if '/' not in names:
             if (names != ''):
                 outFile.write(names + '\n')
-                applied += 1
             
-    outFile.write("\nApplied: {}\n".format(applied))
-    outFile.write("Rejections: {}".format(rejects))
-    
 def print_list(inputList):
     for x in inputList:
         print(x)
