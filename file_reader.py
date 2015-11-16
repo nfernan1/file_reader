@@ -10,19 +10,23 @@ def sort_jobs(inputFile):
 
     # Put text file contents into a list to sort
     with open(inputFile, 'r') as inFile:
-        if currentDate in inFile.read():
-            for line in inFile:
-                if currentDate in line:
-                    existingFile.write("\n{}".format(currentDate));
-                    newJobsList = [line.strip('\n') for line in existingFile]
-        else:
+
+       #if currentDate in inFile.read():
+        for line in inFile:
+            line = line.strip('\n')
+            if currentDate not in line:
+                continue
+            else:
+               newJobsList = [linesAfterDate.strip('\n') for linesAfterDate in inFile]
+        newJobsList.sort() 
+
+        if currentDate not in inFile.read():
             firstLine = inFile.readline()
             contentList = [companyNames.strip('\n') for companyNames in inFile.readlines()]
 
-    # Sort List alphabetically
-    contentList.sort()
-    newJobsList.sort()
+            contentList.sort()
 
+    
     if not os.path.exists("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt"):
 
         with open("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt", 'w') as outFile:
@@ -34,22 +38,13 @@ def sort_jobs(inputFile):
         if currentDate not in open("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt", 'r').read():
 
             # Means that text file is updated and should just update the existing file with the new info
-            with open("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt", 'a') as existingFile:
-                update_coint_rejections_and_applied(newJobsList, rejections, appliedCount, outFile)
-                
-          #  for names in newJobsList:
-        #     if('-X' in names):
-         #           rejections += 1
-          #      if '/' not in names:
-           #         if (names != ''):
-            #            existingFile.write(names + '\n')
-             #           appliedCount += 1
-                    
+            with open("D:\Software\Google Drive\Documents\jobs_applied_sorted.txt", 'a+') as existingFile:
+                if currentDate not in existingFile.read():
+                    existingFile.write("\n{}\n".format(currentDate))
+                    update_count_rejections_and_applied(newJobsList, rejections, appliedCount, existingFile)
+
             #existingFile.write("\nApplied: {}\n".format(appliedCount))
             #existingFile.write("Rejections: {}".format(rejections))
-                    
-    inFile.close()
-    outFile.close()
 
 def update_count_rejections_and_applied(list, rejects, applied, outFile):
     for names in list:
@@ -68,8 +63,8 @@ def print_list(inputList):
         print(x)
         
 def main():
-    providedFilename = input("Enter fileName: ")
-    sort_jobs(providedFilename + ".txt")
+    #providedFilename = input("Enter fileName: ")
+    sort_jobs("jobs_applied.txt")
     
 
 if __name__ == "__main__":
